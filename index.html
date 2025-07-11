@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -12,68 +13,60 @@
 </head>
 <body>
 
-  <h2>🔍 ค้นหาสถานี CORS ตามจังหวัด</h2>
+<h2>🔍 ค้นหาสถานี CORS ตามจังหวัด</h2>
 
-  <label for="province">เลือกจังหวัด:</label>
-  <select id="province">
-    <option value="">-- กรุณาเลือก --</option>
-    <option>นนทบุรี</option>
-    <option>ชลบุรี</option>
-    <option>กรุงเทพมหานคร</option>
-    <option>ขอนแก่น</option>
-    <option>เชียงราย</option>
-    <option>ระยอง</option>
-    <option>นครปฐม</option>
-  </select>
+<label for="province">เลือกจังหวัด:</label>
+<select id="province">
+  <option value="">-- กรุณาเลือก --</option>
+  <option>กรุงเทพมหานคร</option>
+  <option>ชลบุรี</option>
+  <option>ขอนแก่น</option>
+  <option>นครราชสีมา</option>
+  <option>เชียงใหม่</option>
+  <option>ยะลา</option>
+  <option>สมุทรปราการ</option>
+</select>
 
-  <button onclick="search()">ค้นหา</button>
+<button onclick="search()">ค้นหา</button>
 
-  <div id="result"></div>
+<div id="result"></div>
 
-  <script>
-    const apiURL = 'https://script.google.com/macros/s/AKfycbzQ69AilKo_0yKR503LqdoDTQjPmHRMJRCrgUQeZMvJ5TH8mVGsskeCEkkEE/exec?type=cors&province=';
+<script>
+  const apiURL = 'https://script.google.com/macros/s/AKfycbzQ69AilKo_0yKR503LqdoDTQjPmHRMJRCrgUQeZMvJ5TH8mVGsskeCEkkEEpDNlv_/exec?type=cors&province=';
 
+  function search() {
+    const province = document.getElementById('province').value;
+    if (!province) return alert("กรุณาเลือกจังหวัด");
 
-    function search() {
-      const province = document.getElementById('province').value;
-      if (!province) return alert("กรุณาเลือกจังหวัด");
+    fetch(apiURL + encodeURIComponent(province))
+      .then(res => res.json())
+      .then(data => {
+        if (!data.length) {
+          document.getElementById('result').innerHTML = '<p>ไม่พบข้อมูลในจังหวัดนี้</p>';
+          return;
+        }
 
-      fetch(apiURL + encodeURIComponent(province))
-        .then(res => res.json())
-        .then(data => {
-          if (!data.length) {
-            document.getElementById('result').innerHTML = '<p>ไม่พบข้อมูลในจังหวัดนี้</p>';
-            return;
+        let table = '<table><tr>';
+        for (let key in data[0]) {
+          table += `<th>${key}</th>`;
+        }
+        table += '</tr>';
+
+        data.forEach(row => {
+          table += '<tr>';
+          for (let key in row) {
+            table += `<td>${row[key]}</td>`;
           }
-
-          let html = `<table>
-            <tr>
-              <th>CORS</th>
-              <th>จังหวัด</th>
-              <th>GNSS Receiver</th>
-              <th>Latitude</th>
-              <th>Longitude</th>
-              <th>Phase</th>
-            </tr>`;
-          data.forEach(row => {
-            html += `<tr>
-              <td>${row["CORS"] || ''}</td>
-              <td>${row["จังหวัด"] || ''}</td>
-              <td>${row["GNSS Receiver"] || ''}</td>
-              <td>${row["Latitude"] || ''}</td>
-              <td>${row["Longitude"] || ''}</td>
-              <td>${row["Phase"] || ''}</td>
-            </tr>`;
-          });
-          html += `</table>`;
-          document.getElementById('result').innerHTML = html;
-        })
-        .catch(err => {
-          document.getElementById('result').innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
-          console.error(err);
+          table += '</tr>';
         });
-    }
-  </script>
+        table += '</table>';
+        document.getElementById('result').innerHTML = table;
+      })
+      .catch(() => {
+        document.getElementById('result').innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
+      });
+  }
+</script>
 
 </body>
 </html>
