@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ค้นหาสถานี CORS</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    select, button { padding: 6px 10px; margin-right: 10px; }
+  </style>
+</head>
+<body>
+
+  <h2>🔍 ค้นหาสถานี CORS ตามจังหวัด</h2>
+
+  <label for="province">เลือกจังหวัด:</label>
+  <select id="province">
+    <option value="">-- กรุณาเลือก --</option>
+    <option>นนทบุรี</option>
+    <option>ชลบุรี</option>
+    <option>กรุงเทพมหานคร</option>
+    <option>ขอนแก่น</option>
+    <option>เชียงราย</option>
+    <option>ระยอง</option>
+    <option>นครปฐม</option>
+  </select>
+
+  <button onclick="search()">ค้นหา</button>
+
+  <div id="result"></div>
+
+  <script>
+    const apiURL = 'https://script.google.com/macros/s/AKfycbwI2XumOtsMwPN8v2j1cSVwjUcYq3T9bxnY5Ns0BPmO/exec?type=cors&province=';
+
+    function search() {
+      const province = document.getElementById('province').value;
+      if (!province) return alert("กรุณาเลือกจังหวัด");
+
+      fetch(apiURL + encodeURIComponent(province))
+        .then(res => res.json())
+        .then(data => {
+          if (!data.length) {
+            document.getElementById('result').innerHTML = '<p>ไม่พบข้อมูลในจังหวัดนี้</p>';
+            return;
+          }
+
+          let html = `<table>
+            <tr>
+              <th>CORS</th>
+              <th>จังหวัด</th>
+              <th>GNSS Receiver</th>
+              <th>Latitude</th>
+              <th>Longitude</th>
+              <th>Phase</th>
+            </tr>`;
+          data.forEach(row => {
+            html += `<tr>
+              <td>${row["CORS"] || ''}</td>
+              <td>${row["จังหวัด"] || ''}</td>
+              <td>${row["GNSS Receiver"] || ''}</td>
+              <td>${row["Latitude"] || ''}</td>
+              <td>${row["Longitude"] || ''}</td>
+              <td>${row["Phase"] || ''}</td>
+            </tr>`;
+          });
+          html += `</table>`;
+          document.getElementById('result').innerHTML = html;
+        })
+        .catch(err => {
+          document.getElementById('result').innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
+          console.error(err);
+        });
+    }
+  </script>
+
+</body>
+</html>
